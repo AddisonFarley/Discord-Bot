@@ -25,7 +25,7 @@ class lookup(commands.Cog):
 	@commands.command()
 	async def wiki(self, ctx, *, search):
 		'''
-		Search, summarize, and link a Wikipedia page.
+		!wiki (search parameters go here)
 	
 		Keyword Arguments:
         self                   	-- This object.
@@ -48,7 +48,7 @@ class lookup(commands.Cog):
 	@commands.command()
 	async def define(self, ctx, word):
 		'''
-		Find the definition of a word using the textblob Word package.
+		!define (a single word goes here)
 	
 		Keyword Arguments:
         self                   	-- This object.
@@ -75,7 +75,7 @@ class lookup(commands.Cog):
 	@commands.command()
 	async def yt(self, ctx, *, search):
 		'''
-		Search and link a youtube video.
+		!yt (search parameters go here)
 
 		Keyword Arguments:
         self                   	-- This object.
