@@ -3,6 +3,7 @@ import os
 import logging
 import bot_token
 
+
 #define what will trigger bot commands
 #https://discordpy.readthedocs.io/en/stable/ext/commands/commands.html
 bot = commands.Bot(command_prefix='!')
