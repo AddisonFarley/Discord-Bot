@@ -1,5 +1,4 @@
 from discord.ext import commands
-from matplotlib.pyplot import hot
 import wikipedia
 from textblob import Word
 import nltk
