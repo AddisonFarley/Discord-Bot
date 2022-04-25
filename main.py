@@ -30,5 +30,13 @@ for filename in os.listdir('./cogs'):
 		bot.load_extension(f'cogs.{filename[:-3]}')
 
 
+#!reload (command) to reload edited cogs from discord
+@bot.command()
+async def reload(ctx):
+    #reloads the cog file to update without restarting bot
+	bot.reload_extension('cogs.tracking')
+	await ctx.send('Cog reloaded.')
+
+
 #bot's authentication token with Discord
 bot.run(bt.DISCORD_TOKEN)
