@@ -1,7 +1,7 @@
 from discord.ext import commands
 import os
 import logging
-import bot_token
+import bot_tokens as bt
 
 
 #define what will trigger bot commands
@@ -31,4 +31,4 @@ for filename in os.listdir('./cogs'):
 
 
 #bot's authentication token with Discord
-bot.run(bot_token.DISCORD_TOKEN)
+bot.run(bt.DISCORD_TOKEN)
