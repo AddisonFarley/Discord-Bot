@@ -16,8 +16,7 @@ class lookup(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_ready(self):
-		#Checking to make sure this cog is loaded upon initialization. 
-		print('Lookup cog loaded')
+		print('Lookup cog loaded') #Checking to make sure this cog is loaded upon initialization. 
 
 
 	@commands.command()
@@ -33,14 +32,10 @@ class lookup(commands.Cog):
         Return Value:
         Summary and URL of queried Wikipedia page.
 		'''
-		#summary from the queried wiki page is captured.
-		summary = wikipedia.summary(search)
-		#the entirety of the queried wiki page is captured.
-		page = wikipedia.page(search)
-		#only taking the URL attribute as this will display a thumbnail on discord.
-		url = page.url
-		#formatted string to send the URL then a newline of the summary.
-		await ctx.send(f'{url}\n{summary}')
+		summary = wikipedia.summary(search) #summary from the queried wiki page is captured.
+		page = wikipedia.page(search) #the entirety of the queried wiki page is captured.
+		url = page.url #only taking the URL attribute as this will display a thumbnail on discord.
+		await ctx.send(f'{url}\n{summary}') #formatted string to send the URL then a newline of the summary.
 	
 	
 	@commands.command()
@@ -56,18 +51,17 @@ class lookup(commands.Cog):
         Return Value:
         Definition (string) of requested word formatted to be italicized on Discord.
 		'''
-		#create a Word instance of the word parameter
-		text = Word(word)
-		#finding the definition of the user-defined word
-		result = text.definitions
-		#creating a formatted string to show the user-defined word first, then open the italics discord command.
-		send = f'{word}: *'
-		#result is a list, so we need to add all the words in the list to the send variable
-		for _ in result:
-			send += _
-		#close the italics Discord command
-		send += '*'
-		await ctx.send(send)
+		text = Word(word) #create a Word instance of the word parameter
+		result = text.definitions #finding the definition of the user-defined word
+		if len(result) != 0: #make sure a definition is only sent for a word that can be defined
+			send = f'{word}: *' #creating a formatted string to show the user-defined word first, then open the italics discord command.
+			for _ in result: #result is a list, so we need to add all the words in the list to the send variable
+				send += _
+			send += '*' #close the italics Discord command
+			await ctx.send(send)
+		
+		else: #if no word can be found, let the user know
+			await ctx.send(f'Could not find a definition for: {word}')
 
 
 	@commands.command()
@@ -83,15 +77,14 @@ class lookup(commands.Cog):
         Return Value:
         Youtube URL (string) result of query. The queried URL is added to the end of the base youtube URL.
 		'''
-		#send the request for user-defined query. 
-		query = YoutubeSearch(search, max_results=1).to_dict()
-		#access the dict from the query variable
-		result = query[0]
-		#base youtube url
-		url = 'https://www.youtube.com'
-		#format the unique URL to the end of the base URL
-		url += result['url_suffix']
-		await ctx.send(url)
+		query = YoutubeSearch(search, max_results=1).to_dict() #send the request for user-defined query. 
+		
+		result = query[0] #access the dict from the query variable
+		
+		url = 'https://www.youtube.com' #base youtube url
+		
+		url += result['url_suffix'] #format the unique URL to the end of the base URL
+		await ctx.send(url) #return youtube link to discord
 	
 	@commands.command()
 	async def reddit(self, ctx, sub_reddit=None, hot_or_new=None):
@@ -114,43 +107,34 @@ class lookup(commands.Cog):
         client_secret = bt.REDDIT_CLIENT_SECRET,  	#your client secret
         user_agent = bt.REDDIT_USER_AGENT, 			#your user agent
 		check_for_async=False)
-		#pulls the user-defined subreddit
-		subreddit = reddit_read_only.subreddit(sub_reddit)
-
-		if sub_reddit == 'popular' or sub_reddit == 'all':
-			front_list = []
-			reddit_read_only.subreddit('all')
-			for post in subreddit.hot(limit=3):
-				front_list.append(post.permalink)
-			url = 'https://www.reddit.com'
-			url_list = []
-			for _ in front_list:
-				url_list.append(f'{url}{_}')
-			for _ in url_list:
-				await ctx.send(_)
-
-		elif hot_or_new == 'new'.lower():
-			new_list = []
-			for post in subreddit.new(limit=3):
-				new_list.append(post.permalink)
-			url = 'https://www.reddit.com'
-			url_list = []
-			for _ in new_list:
-				url_list.append(f'{url}{_}')
-			for _ in url_list:
-				await ctx.send(_)
-
-		elif hot_or_new == "hot".lower() or hot_or_new == None:
-			hot_list = []
-			for post in subreddit.hot(limit=3):
-				hot_list.append(post.permalink)
-			url = 'https://www.reddit.com'
-			url_list = []
-			for _ in hot_list:
-				url_list.append(f'{url}{_}')
-			for _ in url_list:
-				await ctx.send(_)
+		
+		subreddit = reddit_read_only.subreddit(sub_reddit) #pulls the user-defined subreddit
+		try: #conditionals for returned results
+			if hot_or_new == 'new'.lower(): #return top 3 new posts if argument=new
+				new_list = [] #create a list to store URLs
+				for post in subreddit.new(limit=3):
+					new_list.append(post.permalink) #store URLs in list
+				url = 'https://www.reddit.com' #base URL
+				url_list = [] #new list to combine base/returned URLs
+				for _ in new_list: 
+					url_list.append(f'{url}{_}') #combining URLs
+				for _ in url_list:
+					await ctx.send(_) #return URLs to discord
+	
+			elif hot_or_new == "hot".lower() or hot_or_new == None: #return top 3 hot posts if argument=hot or None
+				hot_list = [] #create a list to store URLs
+				for post in subreddit.hot(limit=3):
+					hot_list.append(post.permalink) #store URLs in list
+				url = 'https://www.reddit.com' #base URL
+				url_list = [] #new list to combine base/returned URLs
+				for _ in hot_list:
+					url_list.append(f'{url}{_}') #combining URLs
+				for _ in url_list:
+					await ctx.send(_) #return URLs to discord
+		except: #message for no returned results
+			await ctx.send(f'Could not find posts for r/{sub_reddit}. Check the spelling of your desired subreddit. If spelt correctly, the subreddit was likely suspended or banned.')
 
 
+#communicates with extension loader/reloader in main
 def setup(bot):
 	bot.add_cog(lookup(bot))
