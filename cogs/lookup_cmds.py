@@ -53,6 +53,7 @@ class lookup(commands.Cog):
 		'''
 		text = Word(word) #create a Word instance of the word parameter
 		result = text.definitions #finding the definition of the user-defined word
+		
 		if len(result) != 0: #make sure a definition is only sent for a word that can be defined
 			send = f'{word}: *' #creating a formatted string to show the user-defined word first, then open the italics discord command.
 			for _ in result: #result is a list, so we need to add all the words in the list to the send variable
@@ -78,11 +79,8 @@ class lookup(commands.Cog):
         Youtube URL (string) result of query. The queried URL is added to the end of the base youtube URL.
 		'''
 		query = YoutubeSearch(search, max_results=1).to_dict() #send the request for user-defined query. 
-		
 		result = query[0] #access the dict from the query variable
-		
 		url = 'https://www.youtube.com' #base youtube url
-		
 		url += result['url_suffix'] #format the unique URL to the end of the base URL
 		await ctx.send(url) #return youtube link to discord
 	
