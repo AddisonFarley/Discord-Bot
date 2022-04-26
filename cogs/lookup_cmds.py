@@ -32,10 +32,14 @@ class lookup(commands.Cog):
         Return Value:
         Summary and URL of queried Wikipedia page.
 		'''
-		summary = wikipedia.summary(search) #summary from the queried wiki page is captured.
-		page = wikipedia.page(search) #the entirety of the queried wiki page is captured.
-		url = page.url #only taking the URL attribute as this will display a thumbnail on discord.
-		await ctx.send(f'{url}\n{summary}') #formatted string to send the URL then a newline of the summary.
+		try: #if a wiki page is found
+			summary = wikipedia.summary(search) #summary from the queried wiki page is captured.
+			page = wikipedia.page(search) #the entirety of the queried wiki page is captured.
+			url = page.url #only taking the URL attribute as this will display a thumbnail on discord.
+			await ctx.send(f'{url}\n{summary}') #formatted string to send the URL then a newline of the summary.
+			
+		except: #if a wiki page cannot be found
+			await ctx.send(f'Could not find a wiki page for {search}.')
 	
 	
 	@commands.command()
