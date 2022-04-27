@@ -1,0 +1,7 @@
+discord.py==1.7.3
+nltk==3.7
+pipreqs==0.4.11
+praw==7.5.0
+textblob==0.17.1
+wikipedia==1.4.0
+youtube_search==2.1.0
