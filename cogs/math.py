@@ -9,7 +9,7 @@ class math_calculator(commands.Cog):
 	    print('Math cog loaded') #Checking to make sure this cog is loaded upon initialization.
 
 	@commands.command()
-	async def math(self, ctx, *, equation):
+	async def math(round(eval(equation), 2)):
 		'''
 		!math (equation)
 
