@@ -4,7 +4,6 @@ Forked from: https://gist.github.com/vbe0201/ade9b80f2d3b64643d854938d40a0a2d
 The fork was used as boilerplate code but has issues currently being addressed.
 This fork is continuously being updated/changed and is not compatible with the source version. 
 '''
-
 import asyncio
 import functools
 import itertools
@@ -224,9 +223,9 @@ class voice_state:
             self.next.clear()
 
             if not self.loop:
-                '''Try to get the next song within 10 seconds. If no song will be added to the queue in time, the player will disconnect.'''
+                '''Try to get the next song within 5 seconds. If no song will be added to the queue in time, the player will disconnect.'''
                 try:
-                    async with timeout(10):  #10 seconds
+                    async with timeout(5):  #5 seconds
                         self.current = await self.songs.get()
                 except asyncio.TimeoutError:
                     self.bot.loop.create_task(self.stop())
@@ -302,23 +301,6 @@ class music(commands.Cog):
 
         ctx.voice_state.voice = await destination.connect()
 
-    @commands.command(name='summon')
-    @commands.has_permissions(manage_guild=True)
-    async def _summon(self, ctx: commands.Context, *, channel: discord.VoiceChannel = None):
-        '''Summons the bot to a voice channel.
-        If no channel was specified, it joins your channel.
-        '''
-
-        if not channel and not ctx.author.voice:
-            raise VoiceError('You are neither connected to a voice channel nor specified a channel to join.')
-
-        destination = channel or ctx.author.voice.channel
-        if ctx.voice_state.voice:
-            await ctx.voice_state.voice.move_to(destination)
-            return
-
-        ctx.voice_state.voice = await destination.connect()
-
     @commands.command(name='leave', aliases=['disconnect'])
     @commands.has_permissions(manage_guild=True)
     async def _leave(self, ctx: commands.Context):
@@ -329,25 +311,6 @@ class music(commands.Cog):
 
         await ctx.voice_state.stop()
         del self.voice_states[ctx.guild.id]
-
-    @commands.command(name='volume')
-    async def _volume(self, ctx: commands.Context, *, volume: int):
-        '''Sets the volume of the player.'''
-
-        if not ctx.voice_state.is_playing:
-            return await ctx.send('Nothing being played at the moment.')
-
-        if 0 > volume > 100:
-            return await ctx.send('Volume must be between 0 and 100')
-
-        ctx.voice_state.volume = volume / 100
-        await ctx.send('Volume of the player set to {}%'.format(volume))
-
-    @commands.command(name='now', aliases=['current', 'playing'])
-    async def _now(self, ctx: commands.Context):
-        '''Displays the currently playing song.'''
-
-        await ctx.send(embed=ctx.voice_state.current.create_embed())
 
     @commands.command(name='pause')
     @commands.has_permissions(manage_guild=True)
@@ -380,30 +343,15 @@ class music(commands.Cog):
 
     @commands.command(name='skip')
     async def _skip(self, ctx: commands.Context):
-        '''Vote to skip a song. The requester can automatically skip.
-        3 skip votes are needed for the song to be skipped.
-        '''
+        '''Skips the current song.'''
 
         if not ctx.voice_state.is_playing:
             return await ctx.send('Not playing any music right now...')
 
-        voter = ctx.message.author
-        if voter == ctx.voice_state.current.requester:
+        requestor = ctx.message.author
+        if requestor == ctx.voice_state.current.requester:
             await ctx.message.add_reaction('⏭')
             ctx.voice_state.skip()
-
-        elif voter.id not in ctx.voice_state.skip_votes:
-            ctx.voice_state.skip_votes.add(voter.id)
-            total_votes = len(ctx.voice_state.skip_votes)
-
-            if total_votes >= 3:
-                await ctx.message.add_reaction('⏭')
-                ctx.voice_state.skip()
-            else:
-                await ctx.send('Skip vote added, currently at **{}/3**'.format(total_votes))
-
-        else:
-            await ctx.send('You have already voted to skip this song.')
 
     @commands.command(name='queue')
     async def _queue(self, ctx: commands.Context, *, page: int = 1):
@@ -480,9 +428,12 @@ class music(commands.Cog):
                 await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
             else:
                 current_song = song(source)
-
-                await ctx.voice_state.songs.put(current_song)
-                await ctx.send('Enqueued {}'.format(str(source)))
+                if not ctx.voice_state.is_playing:
+	                await ctx.voice_state.songs.put(current_song)
+	                await ctx.send('Now playing: {}'.format(str(source)))
+                else:
+                    await ctx.voice_state.songs.put(current_song)
+                    await ctx.send('Song added to queue: {}'.format(str(source)))
 
     @_join.before_invoke
     @_play.before_invoke
