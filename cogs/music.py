@@ -1,3 +1,10 @@
+'''
+Forked from: https://gist.github.com/vbe0201/ade9b80f2d3b64643d854938d40a0a2d
+
+The fork was used as boilerplate code but has issues currently being addressed.
+This fork is continuously being updated/changed and is not compatible with the source version. 
+'''
+
 import asyncio
 import functools
 import itertools
